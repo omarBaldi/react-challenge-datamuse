@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { useDebouncedValue } from './hooks/useDebouncedValue';
 import { usePromise } from './hooks/usePromise';
@@ -8,13 +8,23 @@ function App() {
   const [inputBoxValue, setInputBoxValue] = useState<string>('');
   const debouncedInputBoxValue = useDebouncedValue(inputBoxValue);
 
+  /**
+   * @description
+   * To prevent creating a new function reference on every re-render
+   * we can use useCallback to only creating a new one when debounced
+   * value changes and ensure a performance optimization.
+   */
+  const memoizedPromiseFn = useCallback(() => {
+    return getSynonyms({ keyToSearch: debouncedInputBoxValue });
+  }, [debouncedInputBoxValue]);
+
   const {
     isLoading,
     hasErrorOccurred,
     data: synonyms = [],
     executePromise: startSearchingForSynonyms,
   } = usePromise({
-    promiseFn: () => getSynonyms({ keyToSearch: debouncedInputBoxValue }),
+    promiseFn: memoizedPromiseFn,
   });
 
   const handleInputBoxChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
