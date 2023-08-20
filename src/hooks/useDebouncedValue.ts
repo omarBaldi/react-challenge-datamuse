@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
-export const useDebouncedValue = <T>(value: T) => {
+const defaultMsToWait = 1000;
+
+export const useDebouncedValue = <T>(value: T, msToWait = defaultMsToWait) => {
   const [debouncedValue, setDebouncedValue] = useState<T>(() => {
     return value;
   });
 
   useEffect(() => {
-    const msToWait = 1000;
     const timeout = setTimeout(() => {
       setDebouncedValue(value);
     }, msToWait);
@@ -14,7 +15,7 @@ export const useDebouncedValue = <T>(value: T) => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [value]);
+  }, [value, msToWait]);
 
   return debouncedValue;
 };
