@@ -33,10 +33,10 @@ function App() {
   };
 
   useEffect(() => {
-    if (!debouncedInputBoxValue) return;
-
-    startSearchingForSynonyms();
-  }, [debouncedInputBoxValue]);
+    if (debouncedInputBoxValue) {
+      startSearchingForSynonyms();
+    }
+  }, [debouncedInputBoxValue, startSearchingForSynonyms]);
 
   return (
     <>

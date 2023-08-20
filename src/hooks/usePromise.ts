@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const usePromise = <T>({ promiseFn }: { promiseFn: () => Promise<T> }) => {
   const promiseFnToExecute = useRef<typeof promiseFn>(promiseFn);
@@ -11,7 +11,7 @@ export const usePromise = <T>({ promiseFn }: { promiseFn: () => Promise<T> }) =>
     promiseFnToExecute.current = promiseFn;
   }, [promiseFn]);
 
-  const executePromise = (): void => {
+  const executePromise = useCallback(() => {
     setIsLoading(true);
 
     promiseFnToExecute
@@ -19,7 +19,7 @@ export const usePromise = <T>({ promiseFn }: { promiseFn: () => Promise<T> }) =>
       .then(setData)
       .catch(() => setHasErrorOccurred(true))
       .finally(() => setIsLoading(false));
-  };
+  }, []);
 
   return {
     isLoading,
