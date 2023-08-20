@@ -1,6 +1,6 @@
 import { DataMuseApiClient } from '../config/datamuse-api';
 
-interface SynonymData {
+export interface SynonymData {
   word: string;
   score: number;
   tags: string[];
