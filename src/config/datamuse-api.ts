@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SynonymData } from './../services/get-synonyms';
 
 export const DataMuseApiClient = axios.create({
-  baseURL: 'https://api.datamuse.com',
+  baseURL: import.meta.env.VITE_BASE_API_URL,
 });
 
 /**
