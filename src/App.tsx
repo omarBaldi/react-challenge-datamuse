@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import { useDebouncedValue } from './hooks/useDebouncedValue';
+import { usePromise } from './hooks/usePromise';
 import { getSynonyms } from './services/get-synonyms';
 
-/**
- * @description
- * TODO: render results in DOM
- * TODO: create custom hook to handle API state (loading, error, data)
- */
 function App() {
   const [inputBoxValue, setInputBoxValue] = useState<string>('');
   const debouncedInputBoxValue = useDebouncedValue(inputBoxValue);
-  const [synonyms, setSynonyms] = useState<string[]>([]);
+
+  const {
+    isLoading,
+    hasErrorOccurred,
+    data: synonyms = [],
+    executePromise: startSearchingForSynonyms,
+  } = usePromise({
+    promiseFn: () => getSynonyms({ keyToSearch: debouncedInputBoxValue }),
+  });
 
   const handleInputBoxChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const updatedInputBoxValue = e.target.value;
@@ -21,9 +25,7 @@ function App() {
   useEffect(() => {
     if (!debouncedInputBoxValue) return;
 
-    getSynonyms({ keyToSearch: debouncedInputBoxValue })
-      .then(setSynonyms)
-      .catch(console.error);
+    startSearchingForSynonyms();
   }, [debouncedInputBoxValue]);
 
   return (
@@ -35,10 +37,13 @@ function App() {
         onChange={handleInputBoxChange}
       />
 
-      {synonyms.length > 0 &&
-        synonyms.map((s) => {
-          return <p key={s}>{s}</p>;
-        })}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : hasErrorOccurred ? (
+        <div>An error occurred! Try it again later.</div>
+      ) : synonyms.length > 0 ? (
+        synonyms.map((s) => <p key={s}>{s}</p>)
+      ) : null}
     </>
   );
 }
